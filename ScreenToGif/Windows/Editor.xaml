@@ -292,7 +292,7 @@
 
         <!--Apply and Cancel-->
         <CommandBinding x:Name="OkCommandBinding2" Command="u:Commands.OkAction" CanExecute="PanelAction_CanExecute" Executed="Ok_Executed"/>
-        <CommandBinding Command="u:Commands.CancelAction" CanExecute="PanelAction_CanExecute" Executed="Cancel_Executed"/>
+        <CommandBinding x:Name="CancelCommandBinding" Command="u:Commands.CancelAction" CanExecute="PanelAction_CanExecute" Executed="Cancel_Executed"/>
 
         <!--Frame list-->
         <CommandBinding Command="u:Commands.OpenImage" CanExecute="ListFramesSelection_CanExecute" Executed="OpenImage_Executed"/>
@@ -1351,7 +1351,8 @@
                     <n:InkCanvasExtended x:Name="FreeDrawingInkCanvas" VerticalAlignment="Center" HorizontalAlignment="Center" ClipToBounds="True"
                                          Width="{Binding ElementName=CaptionOverlayGrid, Path=Width, FallbackValue=0}" MinWidth="10" 
                                          Height="{Binding ElementName=CaptionOverlayGrid, Path=Height, FallbackValue=0}" MinHeight="10"
-                                         Visibility="{Binding ElementName=FreeDrawingGrid, Path=Visibility}" Background="Transparent" >
+                                         Visibility="{Binding ElementName=FreeDrawingGrid, Path=Visibility}" Background="Transparent"
+                                         PreviewKeyDown="InkCanvas_PreviewKeyDown">
 
                         <n:InkCanvasExtended.EditingMode>
                             <MultiBinding Converter="{StaticResource SelectionToEditingModeConverter}">
@@ -1381,12 +1382,14 @@
                         </n:InkCanvasExtended.EraserShape>
                     </n:InkCanvasExtended>
 
+                    <!--Left="{Binding Source={x:Static u:UserSettings.All}, Path=WatermarkLeft, Mode=TwoWay}"-->
+                    <!--Top="{Binding Source={x:Static u:UserSettings.All}, Path=WatermarkTop, Mode=TwoWay}"-->
                     <n:MoveResizeControl x:Name="WatermarkOverlayCanvas" VerticalAlignment="Center" HorizontalAlignment="Center" ClipToBounds="True" CanResize="True"
                                          Width="{Binding ElementName=CaptionOverlayGrid, Path=Width, FallbackValue=0}" 
                                          Height="{Binding ElementName=CaptionOverlayGrid, Path=Height, FallbackValue=0}"
                                          Visibility="{Binding ElementName=WatermarkGrid, Path=Visibility}"
-                                         Left="{Binding Source={x:Static u:UserSettings.All}, Path=WatermarkLeft, Mode=TwoWay}"
-                                         Top="{Binding Source={x:Static u:UserSettings.All}, Path=WatermarkTop, Mode=TwoWay}"
+                                         Top="{Binding ElementName=TopWatermarkDoubleUpDown, Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=0}"
+                                         Left="{Binding ElementName=LeftWatermarkDoubleUpDown, Path=Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, FallbackValue=0}"
                                          ContentScale="{Binding Source={x:Static u:UserSettings.All}, Path=WatermarkSize}">
                         <Image x:Name="WatermarkImage" Stretch="Fill" RenderTransformOrigin="0.5,0.5"
                                Source="{Binding Source={x:Static u:UserSettings.All}, Path=WatermarkFilePath, Converter={StaticResource UriToBitmapConverter}}"
@@ -1394,10 +1397,10 @@
                     </n:MoveResizeControl>
 
                     <Border x:Name="BorderOverlayBorder" VerticalAlignment="Center" HorizontalAlignment="Center"
-                                Width="{Binding ElementName=CaptionOverlayGrid, Path=Width, FallbackValue=0}" 
-                                Height="{Binding ElementName=CaptionOverlayGrid, Path=Height, FallbackValue=0}"
-                                Visibility="{Binding ElementName=BorderGrid, Path=Visibility}"
-                                BorderBrush="{Binding ElementName=BorderColorBorder, Path=Background}">
+                            Width="{Binding ElementName=CaptionOverlayGrid, Path=Width, FallbackValue=0}" 
+                            Height="{Binding ElementName=CaptionOverlayGrid, Path=Height, FallbackValue=0}"
+                            Visibility="{Binding ElementName=BorderGrid, Path=Visibility}"
+                            BorderBrush="{Binding ElementName=BorderColorBorder, Path=Background}">
                         <Border.BorderThickness>
                             <MultiBinding Converter="{StaticResource DoubleToThicknessConverter}">
                                 <Binding ElementName="BorderLeftThicknessNumericUpDown" Path="Value"/>
@@ -1442,7 +1445,8 @@
                     <n:InkCanvasExtended x:Name="CinemagraphInkCanvas" VerticalAlignment="Center" HorizontalAlignment="Center" ClipToBounds="True"
                                          Width="{Binding ElementName=CaptionOverlayGrid, Path=Width, FallbackValue=0}" MinWidth="10" 
                                          Height="{Binding ElementName=CaptionOverlayGrid, Path=Height, FallbackValue=0}" MinHeight="10"
-                                         Visibility="{Binding ElementName=CinemagraphGrid, Path=Visibility}" Background="Transparent">
+                                         Visibility="{Binding ElementName=CinemagraphGrid, Path=Visibility}" Background="Transparent"
+                                         PreviewKeyDown="InkCanvas_PreviewKeyDown">
 
                         <n:InkCanvasExtended.EditingMode>
                             <MultiBinding Converter="{StaticResource SelectionToEditingModeConverter}">
@@ -1815,6 +1819,7 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
 
                                 <Grid Grid.Row="0">
@@ -1927,7 +1932,11 @@
                                                     Visibility="{Binding ElementName=ClipboardCheckBox, Path=IsChecked, Converter={StaticResource InvertedBoolToVisibility}}"
                                                     IsChecked="{Binding Source={x:Static u:UserSettings.All}, Path=OverwriteOnSave}"/>
 
-                                <n:ExtendedCheckBox Grid.Row="3" x:Name="ClipboardCheckBox" Text="{DynamicResource S.SaveAs.File.Clipboard}" Margin="3"
+                                <n:ExtendedCheckBox Grid.Row="3" Text="{DynamicResource S.SaveAs.File.ProjectToo}" Margin="3" 
+                                                    Visibility="{Binding IsChecked, ElementName=GifRadioButton, Converter={StaticResource Bool2Visibility}}"
+                                                    IsChecked="{Binding Source={x:Static u:UserSettings.All}, Path=SaveAsProjectToo}"/>
+
+                                <n:ExtendedCheckBox Grid.Row="4" x:Name="ClipboardCheckBox" Text="{DynamicResource S.SaveAs.File.Clipboard}" Margin="3"
                                                     Visibility="{Binding IsChecked, ElementName=GifRadioButton, Converter={StaticResource Bool2Visibility}}"
                                                     IsChecked="{Binding Source={x:Static u:UserSettings.All}, Path=SaveToClipboard}" 
                                                     Checked="SaveToClipboard_CheckedChanged"/>
@@ -1957,7 +1966,7 @@
                             </Grid.RowDefinitions>
 
                             <Label Grid.Row="0" Content="{DynamicResource Recent.Projects}" Margin="5,0" Padding="0,5" Style="{StaticResource LabelSeparator}"/>
-                            <DataGrid Grid.Row="1" x:Name="RecentDataGrid" Margin="10,5,5,5" MinHeight="60" MouseDoubleClick="RecentDataGrid_MouseDoubleClick">
+                            <DataGrid Grid.Row="1" x:Name="RecentDataGrid" Margin="10,5,5,5" MinHeight="60" SelectionMode="Single" SelectionUnit="FullRow" MouseDoubleClick="RecentDataGrid_MouseDoubleClick">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="{DynamicResource Recent.CreationDate}" Width="*" IsReadOnly="True" Binding="{Binding Path=CreationDate, UpdateSourceTrigger=PropertyChanged, StringFormat='{}{0:G}', ConverterCulture={x:Static gl:CultureInfo.CurrentCulture}}"/>
                                     <DataGridTextColumn Header="{DynamicResource Recent.FrameCount}" Width="100" IsReadOnly="True" Binding="{Binding Path=Frames.Count, UpdateSourceTrigger=PropertyChanged}"/>
@@ -2991,15 +3000,16 @@
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
+                                <!--Value="{Binding Source={x:Static u:UserSettings.All}, Path=WatermarkTop, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"-->
+                                <!--Value="{Binding Source={x:Static u:UserSettings.All}, Path=WatermarkLeft, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"-->
+                                
                                 <Label Grid.Row="0" Grid.Column="0" Content="{DynamicResource Crop.Top}" VerticalAlignment="Center" Padding="0"/>
-                                <n:IntegerUpDown Grid.Row="0" Grid.Column="1" x:Name="TopWatermarkIntegerUpDown" Minimum="0" Margin="10,3" MinWidth="70"
-                                                 Value="{Binding Source={x:Static u:UserSettings.All}, Path=WatermarkTop, Mode=TwoWay}"
-                                                 Maximum="{Binding ElementName=WatermarkOverlayCanvas, Path=ActualHeight, FallbackValue=1000}"/>
+                                <n:DoubleUpDown Grid.Row="0" Grid.Column="1" x:Name="TopWatermarkDoubleUpDown" Minimum="-999" Margin="10,3" MinWidth="70"
+                                                Maximum="{Binding ElementName=EditorWindow, Path=FrameSize.Height, FallbackValue=1000, UpdateSourceTrigger=PropertyChanged}"/>
 
                                 <Label Grid.Row="1" Grid.Column="0" Content="{DynamicResource Crop.Left}" VerticalAlignment="Center" Padding="0"/>
-                                <n:IntegerUpDown Grid.Row="1" Grid.Column="1" x:Name="LeftWatermarkIntegerUpDown" Minimum="-999" Margin="10,3" MinWidth="70"
-                                                 Value="{Binding Source={x:Static u:UserSettings.All}, Path=WatermarkLeft, Mode=TwoWay}"
-                                                 Maximum="{Binding ElementName=WatermarkOverlayCanvas, Path=ActualWidth, FallbackValue=1000}"/>
+                                <n:DoubleUpDown Grid.Row="1" Grid.Column="1" x:Name="LeftWatermarkDoubleUpDown" Minimum="-999" Margin="10,3" MinWidth="70"
+                                                Maximum="{Binding ElementName=EditorWindow, Path=FrameSize.Width, FallbackValue=1000, UpdateSourceTrigger=PropertyChanged}"/>
                             </Grid>
                         </Grid>
 

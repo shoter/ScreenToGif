@@ -141,6 +141,16 @@ namespace ScreenToGif.Util
                 Math.Round(rect.Width * scale, MidpointRounding.AwayFromZero), Math.Round(rect.Height * scale, MidpointRounding.AwayFromZero));
         }
 
+        internal static Size Scale(this Size size, double scale)
+        {
+            return new Size(Math.Round(size.Width * scale, MidpointRounding.AwayFromZero), Math.Round(size.Height * scale, MidpointRounding.AwayFromZero));
+        }
+
+        internal static Point Scale(this Point point, double scale)
+        {
+            return new Point(Math.Round(point.X * scale, MidpointRounding.AwayFromZero), Math.Round(point.Y * scale, MidpointRounding.AwayFromZero));
+        }
+
         public static double RoundUpValue(double value, int decimalpoint = 0)
         {
             var result = Math.Round(value, decimalpoint);
@@ -211,6 +221,19 @@ namespace ScreenToGif.Util
         public static string TextResource(this FrameworkElement visual, string key, string defaultValue = "")
         {
             return visual.TryFindResource(key) as string ?? defaultValue;
+        }
+
+        public static Brush RandomBrush()
+        {
+            var rnd = new Random();
+
+            var brushesType = typeof(Brushes);
+
+            var properties = brushesType.GetProperties();
+
+            var random = rnd.Next(properties.Length);
+
+            return (Brush)properties[random].GetValue(null, null);
         }
 
         #region List
